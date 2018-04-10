@@ -68,7 +68,7 @@ list(APPEND Peloton_LINKER_LIBS ${PQXX_LIBRARIES})
 list(APPEND Peloton_LINKER_LIBS "-lssl -lcrypto")
 
 # --[ LLVM 3.7+
-find_package(LLVM REQUIRED CONFIG)
+find_package(LLVM 3.7 REQUIRED CONFIG)
 message(STATUS "Found LLVM ${LLVM_PACKAGE_VERSION}")
 if (${LLVM_PACKAGE_VERSION} VERSION_LESS "3.7")
     message( FATAL_ERROR "LLVM 3.7 or newer is required." )
