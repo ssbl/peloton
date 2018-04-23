@@ -14,7 +14,6 @@
 
 #include "codegen/proxy/proxy.h"
 #include "codegen/proxy/type_builder.h"
-#include "codegen/proxy/type_builder.h"
 #include "function/string_functions.h"
 
 namespace peloton {
@@ -31,10 +30,11 @@ PROXY(StringFunctions) {
   DECLARE_METHOD(RTrim);
   DECLARE_METHOD(Substr);
   DECLARE_METHOD(Repeat);
+  DECLARE_METHOD(Upper);
 };
 
 PROXY(StrWithLen) {
-  DECLARE_MEMBER(0, char*, str);
+  DECLARE_MEMBER(0, char *, str);
   DECLARE_MEMBER(1, uint32_t, length);
   DECLARE_TYPE;
 };

@@ -13,10 +13,10 @@
 #include "codegen/type/varchar_type.h"
 
 #include "codegen/lang/if.h"
+#include "codegen/proxy/date_functions_proxy.h"
 #include "codegen/proxy/string_functions_proxy.h"
 #include "codegen/proxy/timestamp_functions_proxy.h"
 #include "codegen/proxy/values_runtime_proxy.h"
-#include "codegen/proxy/date_functions_proxy.h"
 #include "codegen/type/boolean_type.h"
 #include "codegen/type/decimal_type.h"
 #include "codegen/type/integer_type.h"
@@ -179,6 +179,29 @@ struct Trim : public TypeSystem::UnaryOperatorHandleNull {
     llvm::Value *executor_ctx = ctx.executor_context;
     llvm::Value *ret =
         codegen.Call(StringFunctionsProxy::Trim,
+                     {executor_ctx, val.GetValue(), val.GetLength()});
+
+    llvm::Value *str_ptr = codegen->CreateExtractValue(ret, 0);
+    llvm::Value *str_len = codegen->CreateExtractValue(ret, 1);
+    return Value{Varchar::Instance(), str_ptr, str_len};
+  }
+};
+
+// Upper
+struct Upper : public TypeSystem::UnaryOperatorHandleNull {
+  bool SupportsType(const Type &type) const override {
+    return type.GetSqlType() == Varchar::Instance();
+  }
+
+  Type ResultType(UNUSED_ATTRIBUTE const Type &val_type) const override {
+    return Varchar::Instance();
+  }
+
+  Value Impl(CodeGen &codegen, const Value &val,
+             const TypeSystem::InvocationContext &ctx) const override {
+    llvm::Value *executor_ctx = ctx.executor_context;
+    llvm::Value *ret =
+        codegen.Call(StringFunctionsProxy::Upper,
                      {executor_ctx, val.GetValue(), val.GetLength()});
 
     llvm::Value *str_ptr = codegen->CreateExtractValue(ret, 0);
@@ -536,10 +559,12 @@ std::vector<TypeSystem::ComparisonInfo> kComparisonTable = {{kCompareVarchar}};
 Ascii kAscii;
 Length kLength;
 Trim kTrim;
+Upper kUpper;
 std::vector<TypeSystem::UnaryOpInfo> kUnaryOperatorTable = {
     {OperatorId::Ascii, kAscii},
     {OperatorId::Length, kLength},
-    {OperatorId::Trim, kTrim}};
+    {OperatorId::Trim, kTrim},
+    {OperatorId::Upper, kUpper}};
 
 // Binary operations
 Like kLike;

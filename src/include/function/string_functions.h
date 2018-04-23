@@ -74,6 +74,10 @@ class StringFunctions {
   // Length will return the number of characters in the given string
   static uint32_t Length(executor::ExecutorContext &ctx, const char *str,
                          uint32_t length);
+
+  // Upper
+  static StrWithLen Upper(executor::ExecutorContext &ctx, const char *str,
+                          const uint32_t length);
 };
 
 }  // namespace function

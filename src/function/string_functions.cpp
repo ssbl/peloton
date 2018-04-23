@@ -15,6 +15,8 @@
 #include "common/macros.h"
 #include "executor/executor_context.h"
 
+#include <cctype>
+
 namespace peloton {
 namespace function {
 
@@ -218,6 +220,22 @@ uint32_t StringFunctions::Length(
     UNUSED_ATTRIBUTE const char *str, uint32_t length) {
   PL_ASSERT(str != nullptr);
   return length;
+}
+
+StringFunctions::StrWithLen StringFunctions::Upper(
+    executor::ExecutorContext &ctx, const char *str, const uint32_t length) {
+  PL_ASSERT(str != nullptr);
+
+  // Allocate new memory
+  auto *pool = ctx.GetPool();
+  auto *new_str = reinterpret_cast<char *>(pool->Allocate(length));
+
+  // Upperify all characters (except terminating \0)
+  for (uint32_t i = 0; i < length - 1; ++i) new_str[i] = std::toupper(str[i]);
+  new_str[length - 1] = '\0';
+
+  // We done
+  return StringFunctions::StrWithLen{new_str, length};
 }
 
 }  // namespace function
