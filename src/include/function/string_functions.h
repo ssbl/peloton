@@ -78,6 +78,10 @@ class StringFunctions {
   // Upper
   static StrWithLen Upper(executor::ExecutorContext &ctx, const char *str,
                           const uint32_t length);
+
+  // Lower
+  static StrWithLen Lower(executor::ExecutorContext &ctx, const char *str,
+                          const uint32_t length);
 };
 
 }  // namespace function

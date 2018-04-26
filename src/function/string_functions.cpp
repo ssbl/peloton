@@ -238,5 +238,20 @@ StringFunctions::StrWithLen StringFunctions::Upper(
   return StringFunctions::StrWithLen{new_str, length};
 }
 
+StringFunctions::StrWithLen StringFunctions::Lower(
+    executor::ExecutorContext &ctx, const char *str, const uint32_t length) {
+  PL_ASSERT(str != nullptr);
+
+  // Allocate new memory
+  auto *pool = ctx.GetPool();
+  auto *new_str = reinterpret_cast<char *>(pool->Allocate(length));
+
+  // Lowerify all characters except terminating \0
+  for (uint32_t i = 0; i < length - 1; ++i) new_str[i] = std::tolower(str[i]);
+  new_str[length - 1] = '\0';
+
+  // We done
+  return StringFunctions::StrWithLen{new_str, length};
+}
 }  // namespace function
 }  // namespace peloton

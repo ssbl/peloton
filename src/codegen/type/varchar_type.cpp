@@ -210,6 +210,29 @@ struct Upper : public TypeSystem::UnaryOperatorHandleNull {
   }
 };
 
+// Lower
+struct Lower : public TypeSystem::UnaryOperatorHandleNull {
+  bool SupportsType(const Type &type) const override {
+    return type.GetSqlType() == Varchar::Instance();
+  }
+
+  Type ResultType(UNUSED_ATTRIBUTE const Type &val_type) const override {
+    return Varchar::Instance();
+  }
+
+  Value Impl(CodeGen &codegen, const Value &val,
+             const TypeSystem::InvocationContext &ctx) const override {
+    llvm::Value *executor_ctx = ctx.executor_context;
+    llvm::Value *ret =
+        codegen.Call(StringFunctionsProxy::Lower,
+                     {executor_ctx, val.GetValue(), val.GetLength()});
+
+    llvm::Value *str_ptr = codegen->CreateExtractValue(ret, 0);
+    llvm::Value *str_len = codegen->CreateExtractValue(ret, 1);
+    return Value{Varchar::Instance(), str_ptr, str_len};
+  }
+};
+
 ////////////////////////////////////////////////////////////////////////////////
 ///
 /// Binary operators
@@ -560,11 +583,13 @@ Ascii kAscii;
 Length kLength;
 Trim kTrim;
 Upper kUpper;
+Lower kLower;
 std::vector<TypeSystem::UnaryOpInfo> kUnaryOperatorTable = {
     {OperatorId::Ascii, kAscii},
     {OperatorId::Length, kLength},
     {OperatorId::Trim, kTrim},
-    {OperatorId::Upper, kUpper}};
+    {OperatorId::Upper, kUpper},
+    {OperatorId::Lower, kLower}};
 
 // Binary operations
 Like kLike;

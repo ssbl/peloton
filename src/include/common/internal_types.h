@@ -1085,6 +1085,7 @@ enum class OperatorId : uint32_t {
   Like,
   Now,
   Upper,
+  Lower,
 
   // Add more operators here, before the last "Invalid" entry
   Invalid
